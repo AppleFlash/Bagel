@@ -99,21 +99,25 @@
         
     }
 
-    NSHTTPURLResponse* httpURLResponse = (NSHTTPURLResponse*)self.response;
-    requestInfo.responseHeaders = httpURLResponse.allHeaderFields;
-
-    if (self.isCompleted) {
-        requestInfo.responseData = self.data;
+    if ([self.response isKindOfClass:[NSHTTPURLResponse class]]) {
+        NSHTTPURLResponse* httpURLResponse = (NSHTTPURLResponse*)self.response;
+        requestInfo.responseHeaders = httpURLResponse.allHeaderFields;
+        
+        if (self.isCompleted) {
+            requestInfo.responseData = self.data;
+        }
+        
+        if (httpURLResponse.statusCode != 0) {
+            requestInfo.statusCode = [NSString stringWithFormat:@"%ld", (long)httpURLResponse.statusCode];
+        }
+        
+        requestInfo.startDate = self.startDate;
+        requestInfo.endDate = self.endDate;
+        
+        packet.requestInfo = requestInfo;
+    } else {
+        NSLog(@"Bagel -> Wrong type of response!");
     }
-
-    if (httpURLResponse.statusCode != 0) {
-        requestInfo.statusCode = [NSString stringWithFormat:@"%ld", (long)httpURLResponse.statusCode];
-    }
-
-    requestInfo.startDate = self.startDate;
-    requestInfo.endDate = self.endDate;
-
-    packet.requestInfo = requestInfo;
 
     return packet;
 }
